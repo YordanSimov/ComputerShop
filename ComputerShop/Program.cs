@@ -6,6 +6,7 @@ using FluentValidation;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using ComputerShop.HealthChecks;
+using ComputerShop.Middleware;
 
 //logger
 var logger = new LoggerConfiguration()
@@ -56,5 +57,7 @@ app.MapControllers();
 
 app.RegisterHealthChecks();
 app.MapHealthChecks("/healthz");
+
+app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.Run();
