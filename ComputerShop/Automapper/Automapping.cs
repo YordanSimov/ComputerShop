@@ -10,6 +10,7 @@ namespace ComputerShop.Automapper
         {
             CreateMap<ComputerRequest, Computer>();
             CreateMap<BrandRequest, Brand>();
+            CreateMap<PurchaseRequest, Purchase>();
         }
     }
 }

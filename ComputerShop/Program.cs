@@ -7,6 +7,8 @@ using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using ComputerShop.HealthChecks;
 using ComputerShop.Middleware;
+using ComputerShop.Models.Configurations;
+using ComputerShop.Models.Models;
 
 //logger
 var logger = new LoggerConfiguration()
@@ -18,6 +20,10 @@ var builder = WebApplication.CreateBuilder(args);
 //Register Serilog
 builder.Logging.AddSerilog(logger);
 
+//Kafka
+builder.Services.Configure<KafkaProducerSettings>(builder
+    .Configuration.GetSection(nameof(KafkaProducerSettings)));
+
 //Fluent validation
 builder.Services.AddFluentValidationAutoValidation()
     .AddFluentValidationClientsideAdapters();
@@ -26,6 +32,7 @@ builder.Services.AddValidatorsFromAssemblyContaining(typeof(Program));
 
 // Add services to the container.
 builder.Services.RegisterRepositories()
+        .RegisterKafka<Guid,Purchase>()
         .AddAutoMapper(typeof(Program));
 
 

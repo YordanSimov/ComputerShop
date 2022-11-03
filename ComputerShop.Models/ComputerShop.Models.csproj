@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="MediatR" Version="11.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="MessagePack.Annotations" Version="2.4.35" />
   </ItemGroup>
 
 </Project>
