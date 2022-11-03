@@ -1,4 +1,4 @@
-using ComputerShop.Models.MediatR.Commands;
+﻿using ComputerShop.Models.MediatR.Commands.BrandCommands;
 using ComputerShop.Models.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -8,11 +8,11 @@ namespace ComputerShop.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ComputerController : ControllerBase
+    public class BrandController : ControllerBase
     {
         private readonly IMediator mediator;
 
-        public ComputerController(IMediator mediator)
+        public BrandController(IMediator mediator)
         {
             this.mediator = mediator;
         }
@@ -22,21 +22,21 @@ namespace ComputerShop.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAll()
         {
-            var computers = await mediator.Send(new GetAllComputersCommand());
-            if (computers.Count() <= 0)
+            var brands = await mediator.Send(new GetAllBrandsCommand());
+            if (brands.Count() <= 0)
             {
-                return NotFound("There aren't any computers in the collection");
+                return NotFound("There aren't any brands in the collection");
             }
-            return Ok(computers);
+            return Ok(brands);
         }
 
         [HttpPost(nameof(Add))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Add([FromBody]ComputerRequest computer)
+        public async Task<IActionResult> Add([FromBody] BrandRequest brand)
         {
-            var result = await mediator.Send(new AddComputerCommand(computer));
+            var result = await mediator.Send(new AddBrandCommand(brand));
 
             if (result.HttpStatusCode == HttpStatusCode.BadRequest)
                 return BadRequest(result);
@@ -51,7 +51,7 @@ namespace ComputerShop.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             if (id <= 0) return BadRequest("Id must be greater than 0");
-            var result = await mediator.Send(new GetByIdComputerCommand(id));
+            var result = await mediator.Send(new GetByIdBrandCommand(id));
 
             if (result == null) return NotFound(id);
 
@@ -65,7 +65,7 @@ namespace ComputerShop.Controllers
         public async Task<IActionResult> GetByName(string name)
         {
             if (name.Length <= 0 || string.IsNullOrEmpty(name)) return BadRequest("Name can't be null");
-            var result = await mediator.Send(new GetByNameComputerCommand(name));
+            var result = await mediator.Send(new GetByNameBrandCommand(name));
 
             if (result == null) return NotFound(name);
 
@@ -76,11 +76,11 @@ namespace ComputerShop.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update([FromBody]ComputerRequest computer)
+        public async Task<IActionResult> Update([FromBody] BrandRequest brand)
         {
-            if (computer == null) return BadRequest("Computer can't be null");
+            if (brand == null) return BadRequest("Brand can't be null");
 
-            var result = await mediator.Send(new UpdateComputerCommand(computer));
+            var result = await mediator.Send(new UpdateBrandCommand(brand));
 
             if (result.HttpStatusCode == HttpStatusCode.NotFound)
                 return NotFound(result);
@@ -95,7 +95,7 @@ namespace ComputerShop.Controllers
         {
             if (id <= 0) return BadRequest("Id must be greater than 0");
 
-            var result = await mediator.Send(new DeleteComputerCommand(id));
+            var result = await mediator.Send(new DeleteBrandCommand(id));
 
             if (result.HttpStatusCode == HttpStatusCode.NotFound)
                 return NotFound(id);
