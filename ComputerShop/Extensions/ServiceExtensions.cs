@@ -13,19 +13,15 @@ namespace ComputerShop.Extensions
             services.AddSingleton<IComputerRepository, ComputerRepository>();
             services.AddSingleton<IBrandRepository, BrandRepository>();
             services.AddSingleton<IPurchaseRepository, PurchaseRepository>();
+            services.AddSingleton<IReportRepository, ReportRepository>();
 
             return services;
         }
 
-        public static IServiceCollection RegisterKafka<TKey, TValue>(this IServiceCollection services)
-        {
-            services.AddSingleton<IKafkaProducerService<TKey, TValue>, KafkaProducerService<TKey, TValue>>();
-
-            return services;
-        }
         public static IServiceCollection RegisterHostedService(this IServiceCollection services)
         {
             services.AddHostedService<PurchaseDataflow>();
+            services.AddHostedService<DeliveryInfoDataflow>();
 
             return services;
         }

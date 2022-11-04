@@ -19,5 +19,11 @@ namespace ComputerShop.Models.Models
 
         [Key(4)]
         public string ComputerName { get; set; }
+
+        [Key(5)]
+        public DateTime TimeCreated { get; set; }
+
+        [Key(6)]
+        public DeliveryInfo? DeliveryInfo { get; set; }
     }
 }

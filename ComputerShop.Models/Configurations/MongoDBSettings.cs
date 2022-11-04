@@ -7,5 +7,7 @@
         public string DatabaseName { get; set; }
 
         public string CollectionPurchase { get; set; }
+
+        public string CollectionReport { get; set; }
     }
 }

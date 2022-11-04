@@ -9,13 +9,15 @@ namespace ComputerShop.BL.Kafka
         private readonly ConsumerConfig config;
         private readonly IConsumer<TKey, TValue> consumer;
         private Action<TValue> action;
+        private readonly string topicName;
 
         public IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings { get; set; }
 
-        public KafkaConsumerService(IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings,Action<TValue> action)
+        public KafkaConsumerService(IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings,Action<TValue> action,string topicName)
         {
             this.kafkaConsumerSettings = kafkaConsumerSettings;
             this.action = action;
+            this.topicName = topicName;
             config = new ConsumerConfig()
             {
                 BootstrapServers = kafkaConsumerSettings.CurrentValue.BootstrapServers,
@@ -28,7 +30,7 @@ namespace ComputerShop.BL.Kafka
         }
         public void Consume(CancellationToken cancellationToken)
         {
-            consumer.Subscribe($"{typeof(TValue).Name}ProjectTopic");
+            consumer.Subscribe(topicName);
             while (!cancellationToken.IsCancellationRequested)
             {
                 var cr = consumer.Consume(cancellationToken);

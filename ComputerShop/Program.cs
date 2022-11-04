@@ -8,7 +8,6 @@ using Serilog.Sinks.SystemConsole.Themes;
 using ComputerShop.HealthChecks;
 using ComputerShop.Middleware;
 using ComputerShop.Models.Configurations;
-using ComputerShop.Models.Models;
 
 //logger
 var logger = new LoggerConfiguration()
@@ -39,7 +38,6 @@ builder.Services.AddValidatorsFromAssemblyContaining(typeof(Program));
 
 // Add services to the container.
 builder.Services.RegisterRepositories()
-        .RegisterKafka<Guid, Purchase>()
         .RegisterHostedService()
         .AddAutoMapper(typeof(Program));
 

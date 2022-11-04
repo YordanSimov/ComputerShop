@@ -8,12 +8,14 @@ namespace ComputerShop.BL.Kafka
     {
         private readonly ProducerConfig config;
         private readonly IProducer<TKey, TValue> producer;
+        private readonly string topicName;
+
         public IOptionsMonitor<KafkaProducerSettings> kafkaProducerSettings { get; set; }
 
-        public KafkaProducerService(IOptionsMonitor<KafkaProducerSettings> kafkaProducerSettings)
+        public KafkaProducerService(IOptionsMonitor<KafkaProducerSettings> kafkaProducerSettings,string topicName)
         {
             this.kafkaProducerSettings = kafkaProducerSettings;
-
+            this.topicName = topicName;
             config = new ProducerConfig()
             {
                 BootstrapServers = kafkaProducerSettings.CurrentValue.BootstrapServers
@@ -32,7 +34,7 @@ namespace ComputerShop.BL.Kafka
                     Value = messageValue
                 };
 
-                var result = await producer.ProduceAsync($"{typeof(TValue).Name}ProjectTopic", msg);
+                var result = await producer.ProduceAsync(topicName, msg);
 
                 if (result != null)
                 {

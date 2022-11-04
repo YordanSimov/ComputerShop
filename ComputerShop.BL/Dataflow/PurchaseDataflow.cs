@@ -11,22 +11,28 @@ namespace ComputerShop.BL.Dataflow
 {
     public class PurchaseDataflow : IHostedService
     {
-        private readonly IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings;
         private readonly IPurchaseRepository purchaseRepository;
         private readonly IComputerRepository computerRepository;
+        private readonly IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings;
         private readonly KafkaConsumerService<Guid, Purchase> kafkaConsumerService;
+        private readonly KafkaProducerService<Guid, DeliveryInfo> kafkaProducerService;
         private TransformBlock<Purchase, Purchase> addValuesBlock;
         private ActionBlock<Purchase> addToDBBlock;
 
 
         public PurchaseDataflow(IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings,
+            IOptionsMonitor<KafkaProducerSettings> kafkaProducerSettings,
             IPurchaseRepository purchaseRepository,
             IComputerRepository computerRepository)
         {
-            this.kafkaConsumerSettings = kafkaConsumerSettings;
             this.purchaseRepository = purchaseRepository;
             this.computerRepository = computerRepository;
-            this.kafkaConsumerService = new KafkaConsumerService<Guid, Purchase>(kafkaConsumerSettings,HandlePurchase);
+
+            this.kafkaConsumerSettings = kafkaConsumerSettings;
+            this.kafkaConsumerService = new KafkaConsumerService<Guid, Purchase>
+                (kafkaConsumerSettings,HandlePurchase,kafkaConsumerSettings.CurrentValue.PurchaseTopic);
+            this.kafkaProducerService = new KafkaProducerService<Guid, DeliveryInfo>
+                (kafkaProducerSettings,kafkaProducerSettings.CurrentValue.InfoReportTopic);
 
             addValuesBlock = new TransformBlock<Purchase, Purchase>(async purchase =>
             {
@@ -34,6 +40,7 @@ namespace ComputerShop.BL.Dataflow
 
                 purchase.ComputerPrice = computer.Price;
                 purchase.ComputerName = computer.Name;
+                purchase.TimeCreated = DateTime.Now;
 
                 return purchase;
             });
@@ -42,6 +49,11 @@ namespace ComputerShop.BL.Dataflow
                 if (result != null)
                 {
                     await purchaseRepository.AddPurchase(result);
+
+                    var deliveryInfo = new DeliveryInfo();
+                    deliveryInfo.PurchaseId = result.Id;
+
+                    await kafkaProducerService.Produce(Guid.NewGuid(),deliveryInfo);
                 }
             });
             addValuesBlock.LinkTo(addToDBBlock);
