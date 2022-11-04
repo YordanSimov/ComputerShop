@@ -32,7 +32,7 @@ namespace ComputerShop.BL.Kafka
                     Value = messageValue
                 };
 
-                var result = await producer.ProduceAsync("ComputerTopic", msg);
+                var result = await producer.ProduceAsync($"{typeof(TValue).Name}ProjectTopic", msg);
 
                 if (result != null)
                 {

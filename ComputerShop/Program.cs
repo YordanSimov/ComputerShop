@@ -24,6 +24,13 @@ builder.Logging.AddSerilog(logger);
 builder.Services.Configure<KafkaProducerSettings>(builder
     .Configuration.GetSection(nameof(KafkaProducerSettings)));
 
+builder.Services.Configure<KafkaConsumerSettings>(builder
+    .Configuration.GetSection(nameof(KafkaConsumerSettings)));
+
+//Mongo
+builder.Services.Configure<MongoDBSettings>(builder
+    .Configuration.GetSection(nameof(MongoDBSettings)));
+
 //Fluent validation
 builder.Services.AddFluentValidationAutoValidation()
     .AddFluentValidationClientsideAdapters();
@@ -32,7 +39,8 @@ builder.Services.AddValidatorsFromAssemblyContaining(typeof(Program));
 
 // Add services to the container.
 builder.Services.RegisterRepositories()
-        .RegisterKafka<Guid,Purchase>()
+        .RegisterKafka<Guid, Purchase>()
+        .RegisterHostedService()
         .AddAutoMapper(typeof(Program));
 
 

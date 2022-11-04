@@ -3,7 +3,6 @@ using ComputerShop.Models.MediatR.Commands.PurchaseCommands;
 using ComputerShop.Models.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace ComputerShop.Controllers
 {
