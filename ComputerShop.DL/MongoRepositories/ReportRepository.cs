@@ -15,7 +15,7 @@ namespace ComputerShop.DL.MongoRepositories
         private readonly IMongoCollection<Report> collection;
         private readonly IOptionsMonitor<MongoDBSettings> mongoSettings;
 
-        public ReportRepository(ILogger<ReportRepository> logger,IOptionsMonitor<MongoDBSettings> mongoSettings)
+        public ReportRepository(ILogger<ReportRepository> logger, IOptionsMonitor<MongoDBSettings> mongoSettings)
         {
             this.logger = logger;
             this.mongoSettings = mongoSettings;
@@ -38,9 +38,19 @@ namespace ComputerShop.DL.MongoRepositories
             }
         }
 
-        public Task<Report> GetAllReports()
+        public async Task<IEnumerable<Report>> GetAllReports(DateTime time)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await collection.FindAsync(x => x.ReportTime <= time);
+                    var check = result.ToList();
+                return check;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                return Enumerable.Empty<Report>();
+            }
         }
     }
 }

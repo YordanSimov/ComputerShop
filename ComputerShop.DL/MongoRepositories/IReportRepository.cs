@@ -6,6 +6,6 @@ namespace ComputerShop.DL.MongoRepositories
     {
         Task<Report> CreateReportByTime(Report report);
 
-        Task<Report> GetAllReports();
+        Task<IEnumerable<Report>> GetAllReports(DateTime time);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using ComputerShop.BL.Dataflow;
-using ComputerShop.BL.Kafka;
 using ComputerShop.DL.Interfaces;
 using ComputerShop.DL.MongoRepositories;
 using ComputerShop.DL.Repositories;

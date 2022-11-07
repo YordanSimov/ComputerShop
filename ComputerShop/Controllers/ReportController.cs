@@ -2,6 +2,7 @@
 using ComputerShop.Models.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace ComputerShop.Controllers
 {
@@ -16,13 +17,33 @@ namespace ComputerShop.Controllers
             this.mediator = mediator;
         }
 
-        [HttpPost]
+        [HttpPost(nameof(CreateReportByTime))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
         public async Task<IActionResult> CreateReportByTime(ReportRequest reportRequest)
         {
             var report = await mediator.Send(new CreateReportByTimeCommand(reportRequest));
 
+            if (report.HttpStatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(report.Message);
+            }
             return Ok(report);
+        }
+
+        [HttpGet(nameof(GetAllReports))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        public async Task<IActionResult> GetAllReports(DateTime time)
+        {
+            var reports = await mediator.Send(new GetAllReportsCommand(time));
+            if (reports.Count() <= 0)
+            {
+                return NotFound("There aren't any reports for this time");
+            }
+            return Ok(reports);
         }
     }
 }

@@ -67,11 +67,25 @@ namespace ComputerShop.DL.MongoRepositories
             }
         }
 
+        public async Task<IEnumerable<Purchase>> GetUserPurchases(int userId)
+        {
+            try
+            {
+                var purchases = await collection.FindAsync(x => x.UserId == userId);
+                return purchases.ToList();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                return Enumerable.Empty<Purchase>();
+            }
+        }
+
         public async Task UpdatePurchase(Purchase purchase)
         {
             try
             {
-               var updated = await collection.UpdateOneAsync(x => x.Id == purchase.Id, 
+               await collection.UpdateOneAsync(x => x.Id == purchase.Id, 
                     Builders<Purchase>.Update.Set(x => x.DeliveryInfo, purchase.DeliveryInfo));
             }
             catch (Exception ex)

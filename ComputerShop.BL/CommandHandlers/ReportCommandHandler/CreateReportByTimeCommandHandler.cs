@@ -14,7 +14,7 @@ namespace ComputerShop.BL.CommandHandlers.ReportCommandHandler
         private readonly IPurchaseRepository purchaseRepository;
         private readonly IReportRepository reportRepository;
 
-        public CreateReportByTimeCommandHandler(IMapper mapper,IPurchaseRepository purchaseRepository,IReportRepository reportRepository)
+        public CreateReportByTimeCommandHandler(IMapper mapper, IPurchaseRepository purchaseRepository, IReportRepository reportRepository)
         {
             this.mapper = mapper;
             this.purchaseRepository = purchaseRepository;
@@ -22,17 +22,29 @@ namespace ComputerShop.BL.CommandHandlers.ReportCommandHandler
         }
         public async Task<ReportResponse> Handle(CreateReportByTimeCommand request, CancellationToken cancellationToken)
         {
-            
+
             var report = mapper.Map<Report>(request.Report);
-            var purchases =  await purchaseRepository.GetPurchasesByTime(report.ReportTime);
+            var purchases = await purchaseRepository.GetPurchasesByTime(report.ReportTime);
 
             report.Purchases = purchases.ToList();
             report.Id = Guid.NewGuid();
+
+            var result = await reportRepository.CreateReportByTime(report);
+            if (result == null)
+            {
+                return new ReportResponse()
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "Creating report failed",
+                    Report = result,
+                };
+            }
+
             return new ReportResponse()
             {
                 HttpStatusCode = HttpStatusCode.OK,
                 Message = "Successfully created report",
-                Report = report,
+                Report = result,
             };
         }
     }

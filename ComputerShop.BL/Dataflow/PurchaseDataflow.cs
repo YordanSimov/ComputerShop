@@ -18,6 +18,8 @@ namespace ComputerShop.BL.Dataflow
         private readonly KafkaProducerService<Guid, DeliveryInfo> kafkaProducerService;
         private TransformBlock<Purchase, Purchase> addValuesBlock;
         private ActionBlock<Purchase> addToDBBlock;
+        private ActionBlock<Purchase> produceDeliveryInfoBlock;
+        private BroadcastBlock<Purchase> broadcastBlock;
 
 
         public PurchaseDataflow(IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings,
@@ -34,6 +36,8 @@ namespace ComputerShop.BL.Dataflow
             this.kafkaProducerService = new KafkaProducerService<Guid, DeliveryInfo>
                 (kafkaProducerSettings,kafkaProducerSettings.CurrentValue.InfoReportTopic);
 
+            broadcastBlock = new BroadcastBlock<Purchase>(x=>x);
+
             addValuesBlock = new TransformBlock<Purchase, Purchase>(async purchase =>
             {
                 var computer = await computerRepository.GetById(purchase.ComputerId);
@@ -49,14 +53,21 @@ namespace ComputerShop.BL.Dataflow
                 if (result != null)
                 {
                     await purchaseRepository.AddPurchase(result);
-
+                }
+            });
+            produceDeliveryInfoBlock = new ActionBlock<Purchase>(async result =>
+            {
+                if (result != null)
+                {
                     var deliveryInfo = new DeliveryInfo();
                     deliveryInfo.PurchaseId = result.Id;
 
-                    await kafkaProducerService.Produce(Guid.NewGuid(),deliveryInfo);
+                    await kafkaProducerService.Produce(Guid.NewGuid(), deliveryInfo);
                 }
             });
-            addValuesBlock.LinkTo(addToDBBlock);
+            addValuesBlock.LinkTo(broadcastBlock);
+            broadcastBlock.LinkTo(addToDBBlock);
+            broadcastBlock.LinkTo(produceDeliveryInfoBlock);
         }
 
         private void HandlePurchase(Purchase purchase)
