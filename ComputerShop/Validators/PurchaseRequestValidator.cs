@@ -8,6 +8,7 @@ namespace ComputerShop.Validators
         public PurchaseRequestValidator()
         {
             RuleFor(x => x.ComputerId).GreaterThan(0).NotNull().NotEmpty();
+            RuleFor(x => x.UserId).NotEmpty();
         }
     }
 }
