@@ -67,7 +67,7 @@ namespace ComputerShop.DL.MongoRepositories
             }
         }
 
-        public async Task<IEnumerable<Purchase>> GetUserPurchases(int userId)
+        public async Task<IEnumerable<Purchase>> GetUserPurchases(Guid userId)
         {
             try
             {

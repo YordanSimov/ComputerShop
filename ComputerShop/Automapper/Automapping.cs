@@ -12,6 +12,7 @@ namespace ComputerShop.Automapper
             CreateMap<BrandRequest, Brand>();
             CreateMap<PurchaseRequest, Purchase>();
             CreateMap<ReportRequest, Report>();
+            CreateMap<UserRequest, User>();
         }
     }
 }

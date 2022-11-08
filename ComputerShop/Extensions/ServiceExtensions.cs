@@ -2,6 +2,8 @@
 using ComputerShop.DL.Interfaces;
 using ComputerShop.DL.MongoRepositories;
 using ComputerShop.DL.Repositories;
+using ComputerShop.Models.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace ComputerShop.Extensions
 {
@@ -13,6 +15,7 @@ namespace ComputerShop.Extensions
             services.AddSingleton<IBrandRepository, BrandRepository>();
             services.AddSingleton<IPurchaseRepository, PurchaseRepository>();
             services.AddSingleton<IReportRepository, ReportRepository>();
+            services.AddSingleton<IUserRepository, UserRepository>();
 
             return services;
         }

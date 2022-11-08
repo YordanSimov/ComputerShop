@@ -9,5 +9,11 @@
         public string CollectionPurchase { get; set; }
 
         public string CollectionReport { get; set; }
+
+        public string CollectionUser { get; set; }
+
+        public string DefaultRole { get; set; }
+
+        public string AdminRole { get; set; }
     }
 }

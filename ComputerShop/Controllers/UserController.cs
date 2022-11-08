@@ -3,6 +3,7 @@ using ComputerShop.Models.MediatR.Commands.PurchaseCommands;
 using ComputerShop.Models.MediatR.Commands.UserCommands;
 using ComputerShop.Models.Requests;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComputerShop.Controllers
@@ -18,6 +19,7 @@ namespace ComputerShop.Controllers
             this.mediator = mediator;
         }
 
+        [AllowAnonymous]
         [HttpPost(nameof(BuyComputer))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -38,8 +40,9 @@ namespace ComputerShop.Controllers
         [HttpGet(nameof(GetUserPurchases))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
 
-        public async Task<IActionResult> GetUserPurchases(int userId)
+        public async Task<IActionResult> GetUserPurchases(Guid userId)
         {
             var purchases = await mediator.Send(new GetUserPurchasesCommand(userId));
             if (purchases.Count() <= 0)

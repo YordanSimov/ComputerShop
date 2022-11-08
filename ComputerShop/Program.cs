@@ -8,6 +8,12 @@ using Serilog.Sinks.SystemConsole.Themes;
 using ComputerShop.HealthChecks;
 using ComputerShop.Middleware;
 using ComputerShop.Models.Configurations;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Identity;
+using ComputerShop.Models.Models;
 
 //logger
 var logger = new LoggerConfiguration()
@@ -44,8 +50,53 @@ builder.Services.RegisterRepositories()
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(x =>
+{
+    var jwtSecurityScheme = new OpenApiSecurityScheme()
+    {
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Name = "JWT Authentication",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Description = "Put **_ONLY_** your JWT Bearer token in the text box below",
+        Reference = new OpenApiReference()
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+    x.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+    x.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {jwtSecurityScheme,Array.Empty<string>()}
+    });
+});
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy =>
+    {
+        policy.RequireClaim("Admin");
+    });
+});
+
+//Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            IssuerSigningKey = new SymmetricSecurityKey
+            (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
 //healthchecks
 builder.Services.AddHealthChecks()
     .AddCheck<SQLHealthCheck>("SQL Server");
@@ -62,9 +113,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseHttpsRedirection();
 
 app.MapControllers();
 

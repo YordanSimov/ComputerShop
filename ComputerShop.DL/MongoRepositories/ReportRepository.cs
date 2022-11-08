@@ -38,13 +38,20 @@ namespace ComputerShop.DL.MongoRepositories
             }
         }
 
-        public async Task<IEnumerable<Report>> GetAllReports(DateTime time)
+        public async Task<IEnumerable<Report>> GetAllReports(DateTime? time)
         {
             try
             {
-                var result = await collection.FindAsync(x => x.ReportTime <= time);
-                    var check = result.ToList();
-                return check;
+                if (time == null)
+                {
+                    var result = await collection.FindAsync(x => true);
+                    return result.ToList();
+                }
+                else
+                {
+                    var result = await collection.FindAsync(x => x.ReportTime <= time);
+                    return result.ToList();
+                }
             }
             catch (Exception ex)
             {

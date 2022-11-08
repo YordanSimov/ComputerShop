@@ -12,7 +12,7 @@ namespace ComputerShop.Models.Models
         public int ComputerId { get; set; }
 
         [Key(2)]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
 
         [Key(3)]
         public decimal ComputerPrice { get; set; }

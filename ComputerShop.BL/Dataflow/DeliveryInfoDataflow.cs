@@ -12,22 +12,28 @@ namespace ComputerShop.BL.Dataflow
     {
         private readonly IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings;
         private readonly IPurchaseRepository purchaseRepository;
+        private readonly IUserRepository userRepository;
         private readonly KafkaConsumerService<Guid, DeliveryInfo> kafkaConsumerService;
         private TransformBlock<DeliveryInfo, DeliveryInfo> createValuesBlock;
         private ActionBlock<DeliveryInfo> updateBlock;
 
-        public DeliveryInfoDataflow(IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings,IPurchaseRepository purchaseRepository)
+        public DeliveryInfoDataflow(IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings,
+            IPurchaseRepository purchaseRepository,
+            IUserRepository userRepository)
         {
             this.kafkaConsumerSettings = kafkaConsumerSettings;
             this.purchaseRepository = purchaseRepository;
+            this.userRepository = userRepository;
             this.kafkaConsumerService = new KafkaConsumerService<Guid, DeliveryInfo>
                 (kafkaConsumerSettings, HandleDeliveryInfo,kafkaConsumerSettings.CurrentValue.InfoReportTopic);
 
             createValuesBlock = new TransformBlock<DeliveryInfo, DeliveryInfo>(async deliveryInfo =>
             {
                 var purchase = await purchaseRepository.GetPurchaseById(deliveryInfo.PurchaseId);
+                var user =  await userRepository.GetUserById(purchase.UserId);
+
                 deliveryInfo.Id = Guid.NewGuid();
-                deliveryInfo.Address = $"{purchase.Id} has to be delivered to street {purchase.UserId}";
+                deliveryInfo.Address = user.Address;
                 return deliveryInfo;
             });
             updateBlock = new ActionBlock<DeliveryInfo>(async result =>

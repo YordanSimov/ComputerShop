@@ -13,6 +13,7 @@ namespace ComputerShop.BL.Dataflow
     {
         private readonly IPurchaseRepository purchaseRepository;
         private readonly IComputerRepository computerRepository;
+        private readonly IUserRepository userRepository;
         private readonly IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings;
         private readonly KafkaConsumerService<Guid, Purchase> kafkaConsumerService;
         private readonly KafkaProducerService<Guid, DeliveryInfo> kafkaProducerService;
@@ -25,18 +26,20 @@ namespace ComputerShop.BL.Dataflow
         public PurchaseDataflow(IOptionsMonitor<KafkaConsumerSettings> kafkaConsumerSettings,
             IOptionsMonitor<KafkaProducerSettings> kafkaProducerSettings,
             IPurchaseRepository purchaseRepository,
-            IComputerRepository computerRepository)
+            IComputerRepository computerRepository,
+            IUserRepository userRepository)
         {
             this.purchaseRepository = purchaseRepository;
             this.computerRepository = computerRepository;
+            this.userRepository = userRepository;
 
             this.kafkaConsumerSettings = kafkaConsumerSettings;
             this.kafkaConsumerService = new KafkaConsumerService<Guid, Purchase>
-                (kafkaConsumerSettings,HandlePurchase,kafkaConsumerSettings.CurrentValue.PurchaseTopic);
+                (kafkaConsumerSettings, HandlePurchase, kafkaConsumerSettings.CurrentValue.PurchaseTopic);
             this.kafkaProducerService = new KafkaProducerService<Guid, DeliveryInfo>
-                (kafkaProducerSettings,kafkaProducerSettings.CurrentValue.InfoReportTopic);
+                (kafkaProducerSettings, kafkaProducerSettings.CurrentValue.InfoReportTopic);
 
-            broadcastBlock = new BroadcastBlock<Purchase>(x=>x);
+            broadcastBlock = new BroadcastBlock<Purchase>(x => x);
 
             addValuesBlock = new TransformBlock<Purchase, Purchase>(async purchase =>
             {
@@ -52,7 +55,11 @@ namespace ComputerShop.BL.Dataflow
             {
                 if (result != null)
                 {
-                    await purchaseRepository.AddPurchase(result);
+                    var userCheck = await userRepository.GetUserById(result.UserId);
+                    if (userCheck != null)
+                    {
+                        await purchaseRepository.AddPurchase(result);
+                    }                    
                 }
             });
             produceDeliveryInfoBlock = new ActionBlock<Purchase>(async result =>

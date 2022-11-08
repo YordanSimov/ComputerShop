@@ -3,7 +3,7 @@ using MediatR;
 
 namespace ComputerShop.Models.MediatR.Commands.ReportCommands
 {
-    public record GetAllReportsCommand(DateTime Time) : IRequest<IEnumerable<Report>>
+    public record GetAllReportsCommand(DateTime? Time) : IRequest<IEnumerable<Report>>
     {
     }
 }

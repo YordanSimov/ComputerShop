@@ -12,6 +12,6 @@ namespace ComputerShop.DL.MongoRepositories
 
         Task UpdatePurchase(Purchase purchase);
 
-        Task<IEnumerable<Purchase>> GetUserPurchases(int userId);
+        Task<IEnumerable<Purchase>> GetUserPurchases(Guid userId);
     }
 }
