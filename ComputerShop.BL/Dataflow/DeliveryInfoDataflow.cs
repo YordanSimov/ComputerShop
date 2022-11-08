@@ -24,7 +24,7 @@ namespace ComputerShop.BL.Dataflow
             this.kafkaConsumerSettings = kafkaConsumerSettings;
             this.purchaseRepository = purchaseRepository;
             this.userRepository = userRepository;
-            this.kafkaConsumerService = new KafkaConsumerService<Guid, DeliveryInfo>
+            kafkaConsumerService = new KafkaConsumerService<Guid, DeliveryInfo>
                 (kafkaConsumerSettings, HandleDeliveryInfo,kafkaConsumerSettings.CurrentValue.InfoReportTopic);
 
             createValuesBlock = new TransformBlock<DeliveryInfo, DeliveryInfo>(async deliveryInfo =>

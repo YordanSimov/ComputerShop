@@ -34,9 +34,9 @@ namespace ComputerShop.BL.Dataflow
             this.userRepository = userRepository;
 
             this.kafkaConsumerSettings = kafkaConsumerSettings;
-            this.kafkaConsumerService = new KafkaConsumerService<Guid, Purchase>
+            kafkaConsumerService = new KafkaConsumerService<Guid, Purchase>
                 (kafkaConsumerSettings, HandlePurchase, kafkaConsumerSettings.CurrentValue.PurchaseTopic);
-            this.kafkaProducerService = new KafkaProducerService<Guid, DeliveryInfo>
+            kafkaProducerService = new KafkaProducerService<Guid, DeliveryInfo>
                 (kafkaProducerSettings, kafkaProducerSettings.CurrentValue.InfoReportTopic);
 
             broadcastBlock = new BroadcastBlock<Purchase>(x => x);

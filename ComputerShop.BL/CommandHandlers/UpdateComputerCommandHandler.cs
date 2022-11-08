@@ -12,11 +12,15 @@ namespace ComputerShop.BL.CommandHandlers
     {
         private readonly IMapper mapper;
         private readonly IComputerRepository computerRepository;
+        private readonly IBrandRepository brandRepository;
 
-        public UpdateComputerCommandHandler(IMapper mapper, IComputerRepository computerRepository)
+        public UpdateComputerCommandHandler(IMapper mapper,
+            IComputerRepository computerRepository,
+            IBrandRepository brandRepository)
         {
             this.mapper = mapper;
             this.computerRepository = computerRepository;
+            this.brandRepository = brandRepository;
         }
         public async Task<ComputerResponse> Handle(UpdateComputerCommand request, CancellationToken cancellationToken)
         {
@@ -25,6 +29,13 @@ namespace ComputerShop.BL.CommandHandlers
             {
                 HttpStatusCode = HttpStatusCode.NotFound,
                 Message = "Computer to update does not exist.",
+            };
+
+            var brandCheck = await brandRepository.GetById(request.Computer.BrandId);
+            if (brandCheck == null) return new ComputerResponse()
+            {
+                HttpStatusCode = HttpStatusCode.NotFound,
+                Message = "Brand id to update does not exist.",
             };
 
             var computer = mapper.Map<Computer>(request.Computer);

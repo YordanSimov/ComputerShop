@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputerShop", "ComputerShop.csproj", "{E47D7140-C05C-4595-8FE5-0601663CF5A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComputerShop", "ComputerShop.csproj", "{E47D7140-C05C-4595-8FE5-0601663CF5A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputerShop.DL", "..\ComputerShop.DL\ComputerShop.DL.csproj", "{1D1BF806-6C5D-4863-94FE-D62736BD8C75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComputerShop.DL", "..\ComputerShop.DL\ComputerShop.DL.csproj", "{1D1BF806-6C5D-4863-94FE-D62736BD8C75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputerShop.BL", "..\ComputerShop.BL\ComputerShop.BL.csproj", "{E24F90E9-80FF-4595-9747-D2F580A3AF52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComputerShop.BL", "..\ComputerShop.BL\ComputerShop.BL.csproj", "{E24F90E9-80FF-4595-9747-D2F580A3AF52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputerShop.Models", "..\ComputerShop.Models\ComputerShop.Models.csproj", "{A762D526-EC26-41C5-B35E-69111F88E26C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComputerShop.Models", "..\ComputerShop.Models\ComputerShop.Models.csproj", "{A762D526-EC26-41C5-B35E-69111F88E26C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputerShop.Tests", "..\ComputerShop.Tests\ComputerShop.Tests.csproj", "{EDB8969F-B1D6-482D-A12A-0C31A98D6884}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{A762D526-EC26-41C5-B35E-69111F88E26C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A762D526-EC26-41C5-B35E-69111F88E26C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A762D526-EC26-41C5-B35E-69111F88E26C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDB8969F-B1D6-482D-A12A-0C31A98D6884}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDB8969F-B1D6-482D-A12A-0C31A98D6884}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDB8969F-B1D6-482D-A12A-0C31A98D6884}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDB8969F-B1D6-482D-A12A-0C31A98D6884}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

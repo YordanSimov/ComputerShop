@@ -44,6 +44,9 @@ namespace ComputerShop.Controllers
             if (result.HttpStatusCode == HttpStatusCode.BadRequest)
                 return BadRequest(result);
 
+            if (result.HttpStatusCode == HttpStatusCode.NotFound)
+                return NotFound(result);
+
             return Ok(result);
         }
 
