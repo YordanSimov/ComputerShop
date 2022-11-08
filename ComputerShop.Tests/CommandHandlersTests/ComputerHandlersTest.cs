@@ -1,22 +1,17 @@
-using AutoMapper;
+﻿using AutoMapper;
 using ComputerShop.Automapper;
 using ComputerShop.BL.CommandHandlers;
-using ComputerShop.Controllers;
 using ComputerShop.DL.Interfaces;
 using ComputerShop.Models.MediatR.Commands;
 using ComputerShop.Models.Models;
 using ComputerShop.Models.Requests;
 using ComputerShop.Models.Responses;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Serilog;
 using System.Net;
-using static System.Reflection.Metadata.BlobBuilder;
 
-namespace ComputerShop.Tests
+namespace ComputerShop.Tests.CommandHandlersTests
 {
-    public class ComputerTests
+    public class ComputerHandlersTest
     {
         private List<Computer> computers = new List<Computer>()
         {
@@ -43,20 +38,21 @@ namespace ComputerShop.Tests
         };
 
         private readonly IMapper mapper;
-        private Mock<IMediator> mediator;
         private Mock<IComputerRepository> computerRepository;
         private Mock<IBrandRepository> brandRepository;
+        private CancellationToken cancellationToken;
 
-        public ComputerTests()
+        public ComputerHandlersTest()
         {
             var mockMapperConfig = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new Automapping());
             });
+            mapper = mockMapperConfig.CreateMapper();
 
             computerRepository = new Mock<IComputerRepository>();
             brandRepository = new Mock<IBrandRepository>();
-            mediator = new Mock<IMediator>();
+            cancellationToken = new CancellationToken();
         }
 
         [Fact]
@@ -65,24 +61,13 @@ namespace ComputerShop.Tests
             var expectedCount = 2;
             computerRepository.Setup(x => x.GetAll()).ReturnsAsync(computers);
 
-            mediator.Setup(x => x.Send(It.IsAny<GetAllComputersCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(computers);
+            var getAllCommand = new GetAllComputersCommand();
+            var handler = new GetAllComputersCommandHandler(computerRepository.Object);
+            var handlerResult = await handler.Handle(getAllCommand, cancellationToken);
 
-            var commandHandler = new GetAllComputersCommandHandler(computerRepository.Object);
-
-            var controller = new ComputerController(mediator.Object);
-
-            var result = await controller.GetAll();
-
-            var okObjectResult = result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-
-            var computerResult = okObjectResult.Value as IEnumerable<Computer>;
-
-            Assert.NotNull(computerResult);
-            Assert.NotEmpty(computerResult);
-            Assert.Equal(expectedCount, computerResult.Count());
-            Assert.Equal(computerResult, computers);
+            Assert.NotNull(handlerResult);
+            Assert.NotEmpty(handlerResult);
+            Assert.Equal(expectedCount, handlerResult.Count());
         }
 
         [Fact]
@@ -90,20 +75,12 @@ namespace ComputerShop.Tests
         {
             computerRepository.Setup(x => x.GetAll()).ReturnsAsync(() => Enumerable.Empty<Computer>());
 
-            mediator.Setup(x => x.Send(It.IsAny<GetAllComputersCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Enumerable.Empty<Computer>());
+            var getAllCommand = new GetAllComputersCommand();
+            var handler = new GetAllComputersCommandHandler(computerRepository.Object);
+            var handlerResult = await handler.Handle(getAllCommand, cancellationToken);
 
-            var commandHandler = new GetAllComputersCommandHandler(computerRepository.Object);
-
-            var controller = new ComputerController(mediator.Object);
-
-            var result = await controller.GetAll();
-            var okObjectResult = result as NotFoundObjectResult;
-            Assert.NotNull(okObjectResult);
-
-            var messageResult = okObjectResult.Value as string;
-            Assert.NotNull(messageResult);
-            Assert.Equal("There aren't any computers in the collection", messageResult);
+            Assert.NotNull(handlerResult);
+            Assert.Empty(handlerResult);
         }
 
         [Fact]
@@ -114,18 +91,12 @@ namespace ComputerShop.Tests
 
             computerRepository.Setup(x => x.GetById(computerId)).ReturnsAsync(expectedComputer);
 
-            mediator.Setup(x => x.Send(It.IsAny<GetByIdComputerCommand>(), It.IsAny<CancellationToken>()));
+            var getByIdCommand = new GetByIdComputerCommand(computerId);
+            var handler = new GetByIdComputerCommandHandler(computerRepository.Object);
+            var handlerResult = await handler.Handle(getByIdCommand, cancellationToken);           
 
-            var commandHandler = new GetAllComputersCommandHandler(computerRepository.Object);
-
-            var controller = new ComputerController(mediator.Object);
-
-            var result = await controller.GetById(computerId);
-
-            var notFoundObjectResult = result as NotFoundObjectResult;
-            Assert.NotNull(notFoundObjectResult);
-            Assert.True(notFoundObjectResult.Value is int);
-            Assert.Equal(computerId, (int)notFoundObjectResult.Value);
+            Assert.Null(handlerResult);
+            Assert.Equal(expectedComputer, handlerResult);
         }
         [Fact]
         public async Task Computer_GetComputerById_OK()
@@ -135,20 +106,12 @@ namespace ComputerShop.Tests
 
             computerRepository.Setup(x => x.GetById(computerId)).ReturnsAsync(expectedComputer);
 
-            mediator.Setup(x => x.Send(It.IsAny<GetByIdComputerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(expectedComputer);
-
-            var commandHandler = new GetAllComputersCommandHandler(computerRepository.Object);
-
-            var controller = new ComputerController(mediator.Object);
-
-            var result = await controller.GetById(computerId);
-            var okObjectResult = result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-
-            var computer = okObjectResult.Value as Computer;
-            Assert.NotNull(computer);
-            Assert.Equal(expectedComputer.Id, computerId);
+            var getByIdCommand = new GetByIdComputerCommand(computerId);
+            var handler = new GetByIdComputerCommandHandler(computerRepository.Object);
+            var handlerResult = await handler.Handle(getByIdCommand, cancellationToken);
+        
+            Assert.NotNull(handlerResult);
+            Assert.Equal(expectedComputer, handlerResult);
         }
 
         [Fact]
@@ -159,20 +122,12 @@ namespace ComputerShop.Tests
 
             computerRepository.Setup(x => x.GetByName(computerName)).ReturnsAsync(expectedComputer);
 
-            mediator.Setup(x => x.Send(It.IsAny<GetByNameComputerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(expectedComputer);
-
-            var commandHandler = new GetByNameComputerCommandHandler(computerRepository.Object);
-
-            var controller = new ComputerController(mediator.Object);
-
-            var result = await controller.GetByName(computerName);
-            var okObjectResult = result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-
-            var computer = okObjectResult.Value as Computer;
-            Assert.NotNull(computer);
-            Assert.Equal(computer.Name, computerName);
+            var getByNameCommand = new GetByNameComputerCommand(computerName);
+            var handler = new GetByNameComputerCommandHandler(computerRepository.Object);
+            var handlerResult = await handler.Handle(getByNameCommand, cancellationToken);
+           
+            Assert.NotNull(handlerResult);
+            Assert.Equal(expectedComputer, handlerResult);
         }
 
         [Fact]
@@ -182,19 +137,13 @@ namespace ComputerShop.Tests
             var expectedComputer = computers.FirstOrDefault(x => x.Name == computerName);
 
             computerRepository.Setup(x => x.GetByName(computerName)).ReturnsAsync(expectedComputer);
+          
+            var getByNameCommand = new GetByNameComputerCommand(computerName);
+            var handler = new GetByNameComputerCommandHandler(computerRepository.Object);
+            var handlerResult = await handler.Handle(getByNameCommand, cancellationToken);
 
-            mediator.Setup(x => x.Send(It.IsAny<GetByNameComputerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(expectedComputer);
-
-            var commandHandler = new GetByNameComputerCommandHandler(computerRepository.Object);
-
-            var controller = new ComputerController(mediator.Object);
-
-            var result = await controller.GetByName(computerName);
-            var notFoundObjectResult = result as NotFoundObjectResult;
-            Assert.NotNull(notFoundObjectResult);
-            Assert.True(notFoundObjectResult.Value is string);
-            Assert.Equal(computerName, notFoundObjectResult.Value);
+            Assert.Null(handlerResult);
+            Assert.Equal(expectedComputer, handlerResult);
         }
 
         [Fact]
@@ -248,19 +197,12 @@ namespace ComputerShop.Tests
                 computers.Add(computerToAdd);
             })!.ReturnsAsync(() => computers.FirstOrDefault(x => x.Id == expectedComputerId));
 
-            mediator.Setup(x => x.Send(It.IsAny<AddComputerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(response);
+            var addCommand = new AddComputerCommand(computerRequest);
+            var handler = new AddComputerCommandHandler(computerRepository.Object, mapper, brandRepository.Object);
+            var handlerResult = await handler.Handle(addCommand, cancellationToken);
 
-            var controller = new ComputerController(mediator.Object);
-            var result = await controller.Add(computerRequest);
-
-            var okObjectResult = result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-
-            var resultValue = okObjectResult.Value as ComputerResponse;
-            Assert.NotNull(resultValue);
-            Assert.Equal(expectedComputerId, resultValue.Computer.Id);
-            Assert.Equal(response, resultValue);
+            Assert.NotNull(handlerResult);
+            Assert.Equal(response.Message, handlerResult.Message);
         }
 
         [Fact]
@@ -311,19 +253,13 @@ namespace ComputerShop.Tests
             {
                 computers.Add(computerToAdd);
             })!.ReturnsAsync(() => computers.FirstOrDefault(x => x.Id == expectedComputerId));
+           
+            var addCommand = new AddComputerCommand(computerRequest);
+            var handler = new AddComputerCommandHandler(computerRepository.Object, mapper, brandRepository.Object);
+            var handlerResult = await handler.Handle(addCommand, cancellationToken);
 
-            mediator.Setup(x => x.Send(It.IsAny<AddComputerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(response);
-
-            var controller = new ComputerController(mediator.Object);
-            var result = await controller.Add(computerRequest);
-
-            var notFoundObjectResult = result as NotFoundObjectResult;
-            Assert.NotNull(notFoundObjectResult);
-
-            var resultValue = notFoundObjectResult.Value as ComputerResponse;
-            Assert.NotNull(resultValue);
-            Assert.Equal(response, resultValue);
+            Assert.NotNull(handlerResult);
+            Assert.Equal(response.Message, handlerResult.Message);
         }
 
         [Fact]
@@ -375,18 +311,12 @@ namespace ComputerShop.Tests
                 computers.Add(computerToAdd);
             })!.ReturnsAsync(() => computers.FirstOrDefault(x => x.Id == expectedComputerId));
 
-            mediator.Setup(x => x.Send(It.IsAny<AddComputerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(response);
+            var addCommand = new AddComputerCommand(computerRequest);
+            var handler = new AddComputerCommandHandler(computerRepository.Object, mapper, brandRepository.Object);
+            var handlerResult = await handler.Handle(addCommand, cancellationToken);
 
-            var controller = new ComputerController(mediator.Object);
-            var result = await controller.Add(computerRequest);
-
-            var badRequestObjectResult = result as BadRequestObjectResult;
-            Assert.NotNull(badRequestObjectResult);
-
-            var resultValue = badRequestObjectResult.Value as ComputerResponse;
-            Assert.NotNull(resultValue);
-            Assert.Equal(response, resultValue);
+            Assert.NotNull(handlerResult);
+            Assert.Equal(response.Message, handlerResult.Message);
         }
 
         [Fact]
@@ -441,18 +371,12 @@ namespace ComputerShop.Tests
                 });
             });
 
-            mediator.Setup(x => x.Send(It.IsAny<UpdateComputerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(response);
+            var updateCommand = new UpdateComputerCommand(computerRequest);
+            var handler = new UpdateComputerCommandHandler(mapper, computerRepository.Object, brandRepository.Object);
+            var handlerResult = await handler.Handle(updateCommand, cancellationToken);
 
-            var controller = new ComputerController(mediator.Object);
-            var result = await controller.Update(computerRequest);
-
-            var okObjectResult = result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-
-            var resultValue = okObjectResult.Value as ComputerResponse;
-            Assert.NotNull(resultValue);
-            Assert.Equal(response.Computer.Id, resultValue.Computer.Id);
+            Assert.NotNull(handlerResult);
+            Assert.Equal(response.Message, handlerResult.Message);
         }
 
         [Fact]
@@ -490,18 +414,12 @@ namespace ComputerShop.Tests
             brandRepository.Setup(x => x.GetById(computerRequest.BrandId))
                 .ReturnsAsync(brands.FirstOrDefault(x => x.Id == computerRequest.BrandId));
 
-            mediator.Setup(x => x.Send(It.IsAny<UpdateComputerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(response);
+            var updateCommand = new UpdateComputerCommand(computerRequest);
+            var handler = new UpdateComputerCommandHandler(mapper, computerRepository.Object, brandRepository.Object);
+            var handlerResult = await handler.Handle(updateCommand, cancellationToken);
 
-            var controller = new ComputerController(mediator.Object);
-            var result = await controller.Update(computerRequest);
-
-            var notFoundObjectResult = result as NotFoundObjectResult;
-            Assert.NotNull(notFoundObjectResult);
-
-            var resultValue = notFoundObjectResult.Value as ComputerResponse;
-            Assert.NotNull(resultValue);
-            Assert.Equal(response, resultValue);
+            Assert.NotNull(handlerResult);
+            Assert.Equal(response.Message, handlerResult.Message);
         }
 
         [Fact]
@@ -511,7 +429,7 @@ namespace ComputerShop.Tests
             {
                 Id = 3,
                 BrandId = 1,
-                Name = "Computer1",
+                Name = "Computer3",
                 Price = 1200,
                 Processor = "procesor",
                 RAM = 8,
@@ -539,34 +457,12 @@ namespace ComputerShop.Tests
             brandRepository.Setup(x => x.GetById(computerRequest.BrandId))
                 .ReturnsAsync(brands.FirstOrDefault(x => x.Id == computerRequest.BrandId));
 
-            mediator.Setup(x => x.Send(It.IsAny<UpdateComputerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(response);
+            var updateCommand = new UpdateComputerCommand(computerRequest);
+            var handler = new UpdateComputerCommandHandler(mapper, computerRepository.Object, brandRepository.Object);
+            var handlerResult = await handler.Handle(updateCommand, cancellationToken);
 
-            var controller = new ComputerController(mediator.Object);
-            var result = await controller.Update(computerRequest);
-
-            var notFoundObjectResult = result as NotFoundObjectResult;
-            Assert.NotNull(notFoundObjectResult);
-
-            var resultValue = notFoundObjectResult.Value as ComputerResponse;
-            Assert.NotNull(resultValue);
-            Assert.Equal(response, resultValue);
-        }
-
-        [Fact]
-        public async Task Computer_Update_BadRequest()
-        {
-            mediator.Setup(x => x.Send(It.IsAny<UpdateComputerCommand>(), It.IsAny<CancellationToken>()));
-
-            var controller = new ComputerController(mediator.Object);
-            var result = await controller.Update(null);
-
-            var badRequestObjectResult = result as BadRequestObjectResult;
-            Assert.NotNull(badRequestObjectResult);
-
-            var resultValue = badRequestObjectResult.Value as string;
-            Assert.NotNull(resultValue);
-            Assert.Equal("Computer can't be null", resultValue);
+            Assert.NotNull(handlerResult);
+            Assert.Equal(response.Message, handlerResult.Message);
         }
 
         [Fact]
@@ -585,18 +481,12 @@ namespace ComputerShop.Tests
                 .ReturnsAsync(computerToDelete);
             computerRepository.Setup(x => x.Delete(computerToDelete.Id)).ReturnsAsync(() => computerToDelete);
 
-            mediator.Setup(x => x.Send(It.IsAny<DeleteComputerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(response);
+            var deleteCommand = new DeleteComputerCommand(computerToDelete.Id);
+            var handler = new DeleteComputerCommandHandler(computerRepository.Object);
+            var handlerResult = await handler.Handle(deleteCommand, cancellationToken);
 
-            var controller = new ComputerController(mediator.Object);
-            var result = await controller.Delete(computerToDelete.Id);
-
-            var okObjectResult = result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-
-            var resultValue = okObjectResult.Value as ComputerResponse;
-            Assert.NotNull(resultValue);
-            Assert.Equal(response, resultValue);
+            Assert.NotNull(handlerResult);
+            Assert.Equal(response.Message, handlerResult.Message);
         }
 
         [Fact]
@@ -624,34 +514,12 @@ namespace ComputerShop.Tests
                 .ReturnsAsync(computerToDelete);
             computerRepository.Setup(x => x.Delete(computer.Id)).ReturnsAsync(() => computerToDelete);
 
-            mediator.Setup(x => x.Send(It.IsAny<DeleteComputerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(response);
+            var deleteCommand = new DeleteComputerCommand(computer.Id);
+            var handler = new DeleteComputerCommandHandler(computerRepository.Object);
+            var handlerResult = await handler.Handle(deleteCommand, cancellationToken);
 
-            var controller = new ComputerController(mediator.Object);
-            var result = await controller.Delete(computer.Id);
-
-            var notFoundObjectResult = result as NotFoundObjectResult;
-            Assert.NotNull(notFoundObjectResult);
-
-            var resultValue = (int) notFoundObjectResult.Value;
-            Assert.NotNull(resultValue);
-            Assert.Equal(computer.Id, resultValue);
-        }
-
-        [Fact]
-        public async Task Computer_Delete_BadRequest()
-        {
-            mediator.Setup(x => x.Send(It.IsAny<DeleteComputerCommand>(), It.IsAny<CancellationToken>()));
-
-            var controller = new ComputerController(mediator.Object);
-            var result = await controller.Delete(-1);
-
-            var badRequestObjectResult = result as BadRequestObjectResult;
-            Assert.NotNull(badRequestObjectResult);
-
-            var resultValue = badRequestObjectResult.Value as string;
-            Assert.NotNull(resultValue);
-            Assert.Equal("Id must be greater than 0", resultValue);
+            Assert.NotNull(handlerResult);
+            Assert.Equal(response.Message, handlerResult.Message);
         }
     }
 }
