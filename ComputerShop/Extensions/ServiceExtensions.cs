@@ -2,8 +2,6 @@
 using ComputerShop.DL.Interfaces;
 using ComputerShop.DL.MongoRepositories;
 using ComputerShop.DL.Repositories;
-using ComputerShop.Models.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace ComputerShop.Extensions
 {

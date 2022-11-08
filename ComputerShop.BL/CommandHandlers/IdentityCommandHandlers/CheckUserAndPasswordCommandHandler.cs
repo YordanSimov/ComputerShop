@@ -2,7 +2,6 @@
 using ComputerShop.Models.MediatR.Commands.IdentityCommands;
 using ComputerShop.Models.Models;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using System.Security.Cryptography;
 using System.Text;
 

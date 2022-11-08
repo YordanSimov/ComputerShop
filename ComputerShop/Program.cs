@@ -12,8 +12,6 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
-using ComputerShop.Models.Models;
 
 //logger
 var logger = new LoggerConfiguration()
@@ -99,7 +97,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 //healthchecks
 builder.Services.AddHealthChecks()
-    .AddCheck<SQLHealthCheck>("SQL Server");
+    .AddCheck<SQLHealthCheck>("SQL Server")
+    .AddCheck<MongoDBHealthcheck>("MongoDB");
 
 //MediatR
 builder.Services.AddMediatR(typeof(AddComputerCommandHandler).Assembly);
