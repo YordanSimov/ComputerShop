@@ -26,7 +26,7 @@ namespace ComputerShop.Controllers
 
         public async Task<IActionResult> BuyComputer([FromBody] PurchaseRequest purchaseRequest)
         {
-            var computerCheck =await mediator.Send(new GetByIdComputerCommand(purchaseRequest.ComputerId));
+            var computerCheck = await mediator.Send(new GetByIdComputerCommand(purchaseRequest.ComputerId));
             if (computerCheck == null)
             {
                 return BadRequest("Computer does not exist");
@@ -50,6 +50,21 @@ namespace ComputerShop.Controllers
                 return NotFound("This user hasn't made any purchases yet");
             }
             return Ok(purchases);
+        }
+
+        [HttpGet(nameof(GetAllUsers))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await mediator.Send(new GetAllUsersCommand());
+            if (users.Count() <= 0)
+            {
+                return NotFound("There aren't any users registered.");
+            }
+            return Ok(users);
         }
     }
 }

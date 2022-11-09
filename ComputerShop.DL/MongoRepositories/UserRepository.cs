@@ -28,8 +28,9 @@ namespace ComputerShop.DL.MongoRepositories
         {
             try
             {
-                var users = await GetAllUsers();
-                if (users.Count() <= 0)
+                var users = await collection.FindAsync(x => true);
+                var listUsers = users.ToList();
+                if (listUsers.Count() <= 0)
                 {
                     user.Role = mongoSettings.CurrentValue.AdminRole;
                 }
@@ -91,7 +92,7 @@ namespace ComputerShop.DL.MongoRepositories
         {
             try
             {
-                var result = await collection.FindAsync(x => true);
+                var result = await collection.FindAsync(x => x.Role == mongoSettings.CurrentValue.DefaultRole);
                 return result.ToList();
             }
             catch (Exception ex)
