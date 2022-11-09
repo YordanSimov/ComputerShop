@@ -351,8 +351,8 @@ namespace ComputerShop.Tests.CommandHandlersTests
                 Computer = computerToUpdate,
             };
 
-            computerRepository.Setup(x => x.GetByName(computerRequest.Name))
-                .ReturnsAsync(computers.FirstOrDefault(x => x.Name == computerRequest.Name));
+            computerRepository.Setup(x => x.GetById(computerRequest.Id))
+                .ReturnsAsync(computers.FirstOrDefault(x => x.Id == computerRequest.Id));
             brandRepository.Setup(x => x.GetById(computerRequest.BrandId))
                 .ReturnsAsync(brands.FirstOrDefault(x => x.Id == computerRequest.BrandId));
 
@@ -409,8 +409,8 @@ namespace ComputerShop.Tests.CommandHandlersTests
                 Message = "Brand id to update does not exist.",
             };
 
-            computerRepository.Setup(x => x.GetByName(computerRequest.Name))
-                .ReturnsAsync(computers.FirstOrDefault(x => x.Name == computerRequest.Name));
+            computerRepository.Setup(x => x.GetById(computerRequest.Id))
+                .ReturnsAsync(computers.FirstOrDefault(x => x.Id == computerRequest.Id));
             brandRepository.Setup(x => x.GetById(computerRequest.BrandId))
                 .ReturnsAsync(brands.FirstOrDefault(x => x.Id == computerRequest.BrandId));
 
@@ -452,8 +452,8 @@ namespace ComputerShop.Tests.CommandHandlersTests
                 Message = "Computer to update does not exist.",
             };
 
-            computerRepository.Setup(x => x.GetByName(computerRequest.Name))
-                .ReturnsAsync(computers.FirstOrDefault(x => x.Name == computerRequest.Name));
+            computerRepository.Setup(x => x.GetById(computerRequest.Id))
+                .ReturnsAsync(computers.FirstOrDefault(x => x.Id == computerRequest.Id));
             brandRepository.Setup(x => x.GetById(computerRequest.BrandId))
                 .ReturnsAsync(brands.FirstOrDefault(x => x.Id == computerRequest.BrandId));
 

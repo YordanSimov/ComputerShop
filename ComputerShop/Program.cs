@@ -34,6 +34,10 @@ builder.Services.Configure<KafkaConsumerSettings>(builder
 builder.Services.Configure<MongoDBSettings>(builder
     .Configuration.GetSection(nameof(MongoDBSettings)));
 
+//SQL Server
+builder.Services.Configure<SQLServerSettings>(builder
+    .Configuration.GetSection(nameof(SQLServerSettings)));
+
 //Fluent validation
 builder.Services.AddFluentValidationAutoValidation()
     .AddFluentValidationClientsideAdapters();
@@ -52,12 +56,12 @@ builder.Services.AddSwaggerGen(x =>
 {
     var jwtSecurityScheme = new OpenApiSecurityScheme()
     {
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        Name = "JWT Authentication",
+        Scheme = JwtBearerDefaults.AuthenticationScheme.ToLower(),
+        BearerFormat = JWTSettings.BearerFormat,
+        Name = JWTSettings.Name,
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
-        Description = "Put **_ONLY_** your JWT Bearer token in the text box below",
+        Description =JWTSettings.Description,
         Reference = new OpenApiReference()
         {
             Id = JwtBearerDefaults.AuthenticationScheme,
@@ -73,9 +77,9 @@ builder.Services.AddSwaggerGen(x =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Admin", policy =>
+    options.AddPolicy(IdentitySettings.Admin, policy =>
     {
-        policy.RequireClaim("Admin");
+        policy.RequireClaim(IdentitySettings.Admin);
     });
 });
 
@@ -97,8 +101,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 //healthchecks
 builder.Services.AddHealthChecks()
-    .AddCheck<SQLHealthCheck>("SQL Server")
-    .AddCheck<MongoDBHealthcheck>("MongoDB");
+    .AddCheck<SQLHealthCheck>(HealthCheckSettings.SqlServer)
+    .AddCheck<MongoDBHealthcheck>(HealthCheckSettings.MongoDB);
 
 //MediatR
 builder.Services.AddMediatR(typeof(AddComputerCommandHandler).Assembly);

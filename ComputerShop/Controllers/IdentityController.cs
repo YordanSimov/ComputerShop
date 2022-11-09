@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 using System.Security.Claims;
 using System.Text;
+using ComputerShop.Models.Configurations;
 
 namespace ComputerShop.Controllers
 {
@@ -58,12 +59,11 @@ namespace ComputerShop.Controllers
                         new Claim(JwtRegisteredClaimNames.Sub,configuration.GetSection("Jwt:Subject").Value),
                         new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat,DateTime.Now.ToString()),
-                        new Claim("UserId",user.Id.ToString()),
-                        new Claim("Email",user.Email ?? String.Empty),
-                        new Claim("UserName",user.UserName ?? String.Empty),
+                        new Claim(IdentitySettings.UserId,user.Id.ToString()),
+                        new Claim(IdentitySettings.Email,user.Email ?? String.Empty),
+                        new Claim(IdentitySettings.UserName,user.UserName ?? String.Empty),
+                        new Claim(role,role)
                     };
-
-                        claims.Add(new Claim(role, role));
 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
                     var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

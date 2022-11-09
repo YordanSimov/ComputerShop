@@ -24,7 +24,7 @@ namespace ComputerShop.BL.CommandHandlers
         }
         public async Task<ComputerResponse> Handle(UpdateComputerCommand request, CancellationToken cancellationToken)
         {
-            var computerCheck = await computerRepository.GetByName(request.Computer.Name);
+            var computerCheck = await computerRepository.GetById(request.Computer.Id);
             if (computerCheck == null) return new ComputerResponse()
             {
                 HttpStatusCode = HttpStatusCode.NotFound,

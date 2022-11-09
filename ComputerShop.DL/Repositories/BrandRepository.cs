@@ -1,27 +1,28 @@
 ﻿using ComputerShop.DL.Interfaces;
+using ComputerShop.Models.Configurations;
 using ComputerShop.Models.Models;
 using Dapper;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Data.SqlClient;
 
 namespace ComputerShop.DL.Repositories
 {
     public class BrandRepository : IBrandRepository
     {
-        private readonly IConfiguration configuration;
+        private readonly IOptionsMonitor<SQLServerSettings> sqlServerSettings;
         private readonly ILogger<BrandRepository> logger;
 
-        public BrandRepository(IConfiguration configuration, ILogger<BrandRepository> logger)
+        public BrandRepository(IOptionsMonitor<SQLServerSettings> sqlServerSettings, ILogger<BrandRepository> logger)
         {
-            this.configuration = configuration;
+            this.sqlServerSettings = sqlServerSettings;
             this.logger = logger;
         }
         public async Task<Brand> Add(Brand input)
         {
             try
             {
-                await using (var connection = new SqlConnection(configuration.GetConnectionString("DefaultConnection")))
+                await using (var connection = new SqlConnection(sqlServerSettings.CurrentValue.ConnectionString))
                 {
                     await connection.OpenAsync();
 
@@ -43,7 +44,7 @@ namespace ComputerShop.DL.Repositories
             try
             {
                 var brand = await GetById(id);
-                await using (var connection = new SqlConnection(configuration.GetConnectionString("DefaultConnection")))
+                await using (var connection = new SqlConnection(sqlServerSettings.CurrentValue.ConnectionString))
                 {
                     await connection.OpenAsync();
 
@@ -62,7 +63,7 @@ namespace ComputerShop.DL.Repositories
         {
             try
             {
-                await using (var connection = new SqlConnection(configuration.GetConnectionString("DefaultConnection")))
+                await using (var connection = new SqlConnection(sqlServerSettings.CurrentValue.ConnectionString))
                 {
                     await connection.OpenAsync();
 
@@ -80,7 +81,7 @@ namespace ComputerShop.DL.Repositories
         {
             try
             {
-                await using (var connection = new SqlConnection(configuration.GetConnectionString("DefaultConnection")))
+                await using (var connection = new SqlConnection(sqlServerSettings.CurrentValue.ConnectionString))
                 {
                     await connection.OpenAsync();
 
@@ -98,7 +99,7 @@ namespace ComputerShop.DL.Repositories
         {
             try
             {
-                await using (var connection = new SqlConnection(configuration.GetConnectionString("DefaultConnection")))
+                await using (var connection = new SqlConnection(sqlServerSettings.CurrentValue.ConnectionString))
                 {
                     await connection.OpenAsync();
 
@@ -116,7 +117,7 @@ namespace ComputerShop.DL.Repositories
         {
             try
             {
-                await using (var connection = new SqlConnection(configuration.GetConnectionString("DefaultConnection")))
+                await using (var connection = new SqlConnection(sqlServerSettings.CurrentValue.ConnectionString))
                 {
                     await connection.OpenAsync();
 

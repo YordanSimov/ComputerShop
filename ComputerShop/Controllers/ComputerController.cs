@@ -1,6 +1,8 @@
+using ComputerShop.Models.Configurations;
 using ComputerShop.Models.MediatR.Commands;
 using ComputerShop.Models.Requests;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -36,7 +38,7 @@ namespace ComputerShop.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = IdentitySettings.Admin)]
         public async Task<IActionResult> Add([FromBody]ComputerRequest computer)
         {
             var result = await mediator.Send(new AddComputerCommand(computer));
@@ -84,7 +86,7 @@ namespace ComputerShop.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = IdentitySettings.Admin)]
         public async Task<IActionResult> Update([FromBody]ComputerRequest computer)
         {
             if (computer == null) return BadRequest("Computer can't be null");
@@ -100,7 +102,7 @@ namespace ComputerShop.Controllers
         [HttpDelete(nameof(Delete))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [Authorize(AuthenticationSchemes = "Bearer", Policy = "Admin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = IdentitySettings.Admin)]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0) return BadRequest("Id must be greater than 0");
