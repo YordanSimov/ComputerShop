@@ -93,10 +93,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = JWTAuthenticationSettings.Audience,
+            ValidIssuer = JWTAuthenticationSettings.Issuer,
             IssuerSigningKey = new SymmetricSecurityKey
-            (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            (Encoding.UTF8.GetBytes(JWTAuthenticationSettings.Key))
         };
     });
 //healthchecks

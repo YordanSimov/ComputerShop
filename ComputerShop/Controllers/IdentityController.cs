@@ -56,7 +56,7 @@ namespace ComputerShop.Controllers
                     var role = await mediator.Send(new GetUserRoleCommand(loginRequest.UserName));
                     var claims = new List<Claim>
                     {
-                        new Claim(JwtRegisteredClaimNames.Sub,configuration.GetSection("Jwt:Subject").Value),
+                        new Claim(JwtRegisteredClaimNames.Sub,JWTAuthenticationSettings.Subject),
                         new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat,DateTime.Now.ToString()),
                         new Claim(IdentitySettings.UserId,user.Id.ToString()),
@@ -65,10 +65,10 @@ namespace ComputerShop.Controllers
                         new Claim(role,role)
                     };
 
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWTAuthenticationSettings.Key));
                     var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                    var token = new JwtSecurityToken(configuration["Jwt:Issuer"],
-                        configuration["Jwt:Audience"], claims, expires: DateTime.UtcNow.AddMinutes(10), signingCredentials: signIn);
+                    var token = new JwtSecurityToken(JWTAuthenticationSettings.Issuer,
+                        JWTAuthenticationSettings.Audience, claims, expires: DateTime.UtcNow.AddMinutes(10), signingCredentials: signIn);
 
                     return Ok(new JwtSecurityTokenHandler().WriteToken(token));
                 }
