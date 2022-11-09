@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-using ComputerShop.Automapper;
-using ComputerShop.BL.CommandHandlers;
-using ComputerShop.Controllers;
+﻿using ComputerShop.Controllers;
 using ComputerShop.DL.Interfaces;
 using ComputerShop.Models.MediatR.Commands;
 using ComputerShop.Models.Models;
@@ -40,19 +37,12 @@ namespace ComputerShop.Tests.ControllerTests
             },
         };
 
-        private readonly IMapper mapper;
         private Mock<IMediator> mediator;
         private Mock<IComputerRepository> computerRepository;
         private Mock<IBrandRepository> brandRepository;
 
         public ComputerControllerTest()
         {
-            var mockMapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile(new Automapping());
-            });
-            mapper = mockMapperConfig.CreateMapper();
-
             computerRepository = new Mock<IComputerRepository>();
             brandRepository = new Mock<IBrandRepository>();
             mediator = new Mock<IMediator>();
