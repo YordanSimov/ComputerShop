@@ -40,7 +40,6 @@ namespace ComputerShop.Tests.CommandHandlersTests
         private readonly IMapper mapper;
         private Mock<IComputerRepository> computerRepository;
         private Mock<IBrandRepository> brandRepository;
-        private CancellationToken cancellationToken;
 
         public ComputerHandlersTest()
         {
@@ -52,7 +51,6 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             computerRepository = new Mock<IComputerRepository>();
             brandRepository = new Mock<IBrandRepository>();
-            cancellationToken = new CancellationToken();
         }
 
         [Fact]
@@ -63,7 +61,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var getAllCommand = new GetAllComputersCommand();
             var handler = new GetAllComputersCommandHandler(computerRepository.Object);
-            var handlerResult = await handler.Handle(getAllCommand, cancellationToken);
+            var handlerResult = await handler.Handle(getAllCommand, It.IsAny<CancellationToken>());
 
             Assert.NotNull(handlerResult);
             Assert.NotEmpty(handlerResult);
@@ -77,7 +75,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var getAllCommand = new GetAllComputersCommand();
             var handler = new GetAllComputersCommandHandler(computerRepository.Object);
-            var handlerResult = await handler.Handle(getAllCommand, cancellationToken);
+            var handlerResult = await handler.Handle(getAllCommand, It.IsAny<CancellationToken>());
 
             Assert.NotNull(handlerResult);
             Assert.Empty(handlerResult);
@@ -93,7 +91,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var getByIdCommand = new GetByIdComputerCommand(computerId);
             var handler = new GetByIdComputerCommandHandler(computerRepository.Object);
-            var handlerResult = await handler.Handle(getByIdCommand, cancellationToken);           
+            var handlerResult = await handler.Handle(getByIdCommand, It.IsAny<CancellationToken>());           
 
             Assert.Null(handlerResult);
             Assert.Equal(expectedComputer, handlerResult);
@@ -108,7 +106,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var getByIdCommand = new GetByIdComputerCommand(computerId);
             var handler = new GetByIdComputerCommandHandler(computerRepository.Object);
-            var handlerResult = await handler.Handle(getByIdCommand, cancellationToken);
+            var handlerResult = await handler.Handle(getByIdCommand, It.IsAny<CancellationToken>());
         
             Assert.NotNull(handlerResult);
             Assert.Equal(expectedComputer, handlerResult);
@@ -124,7 +122,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var getByNameCommand = new GetByNameComputerCommand(computerName);
             var handler = new GetByNameComputerCommandHandler(computerRepository.Object);
-            var handlerResult = await handler.Handle(getByNameCommand, cancellationToken);
+            var handlerResult = await handler.Handle(getByNameCommand, It.IsAny<CancellationToken>());
            
             Assert.NotNull(handlerResult);
             Assert.Equal(expectedComputer, handlerResult);
@@ -140,7 +138,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
           
             var getByNameCommand = new GetByNameComputerCommand(computerName);
             var handler = new GetByNameComputerCommandHandler(computerRepository.Object);
-            var handlerResult = await handler.Handle(getByNameCommand, cancellationToken);
+            var handlerResult = await handler.Handle(getByNameCommand, It.IsAny<CancellationToken>());
 
             Assert.Null(handlerResult);
             Assert.Equal(expectedComputer, handlerResult);
@@ -199,7 +197,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var addCommand = new AddComputerCommand(computerRequest);
             var handler = new AddComputerCommandHandler(computerRepository.Object, mapper, brandRepository.Object);
-            var handlerResult = await handler.Handle(addCommand, cancellationToken);
+            var handlerResult = await handler.Handle(addCommand, It.IsAny<CancellationToken>());
 
             Assert.NotNull(handlerResult);
             Assert.Equal(response.Message, handlerResult.Message);
@@ -256,7 +254,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
            
             var addCommand = new AddComputerCommand(computerRequest);
             var handler = new AddComputerCommandHandler(computerRepository.Object, mapper, brandRepository.Object);
-            var handlerResult = await handler.Handle(addCommand, cancellationToken);
+            var handlerResult = await handler.Handle(addCommand, It.IsAny<CancellationToken>());
 
             Assert.NotNull(handlerResult);
             Assert.Equal(response.Message, handlerResult.Message);
@@ -313,7 +311,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var addCommand = new AddComputerCommand(computerRequest);
             var handler = new AddComputerCommandHandler(computerRepository.Object, mapper, brandRepository.Object);
-            var handlerResult = await handler.Handle(addCommand, cancellationToken);
+            var handlerResult = await handler.Handle(addCommand, It.IsAny<CancellationToken>());
 
             Assert.NotNull(handlerResult);
             Assert.Equal(response.Message, handlerResult.Message);
@@ -373,7 +371,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var updateCommand = new UpdateComputerCommand(computerRequest);
             var handler = new UpdateComputerCommandHandler(mapper, computerRepository.Object, brandRepository.Object);
-            var handlerResult = await handler.Handle(updateCommand, cancellationToken);
+            var handlerResult = await handler.Handle(updateCommand, It.IsAny<CancellationToken>());
 
             Assert.NotNull(handlerResult);
             Assert.Equal(response.Message, handlerResult.Message);
@@ -416,7 +414,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var updateCommand = new UpdateComputerCommand(computerRequest);
             var handler = new UpdateComputerCommandHandler(mapper, computerRepository.Object, brandRepository.Object);
-            var handlerResult = await handler.Handle(updateCommand, cancellationToken);
+            var handlerResult = await handler.Handle(updateCommand, It.IsAny<CancellationToken>());
 
             Assert.NotNull(handlerResult);
             Assert.Equal(response.Message, handlerResult.Message);
@@ -459,7 +457,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var updateCommand = new UpdateComputerCommand(computerRequest);
             var handler = new UpdateComputerCommandHandler(mapper, computerRepository.Object, brandRepository.Object);
-            var handlerResult = await handler.Handle(updateCommand, cancellationToken);
+            var handlerResult = await handler.Handle(updateCommand, It.IsAny<CancellationToken>());
 
             Assert.NotNull(handlerResult);
             Assert.Equal(response.Message, handlerResult.Message);
@@ -483,7 +481,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var deleteCommand = new DeleteComputerCommand(computerToDelete.Id);
             var handler = new DeleteComputerCommandHandler(computerRepository.Object);
-            var handlerResult = await handler.Handle(deleteCommand, cancellationToken);
+            var handlerResult = await handler.Handle(deleteCommand, It.IsAny<CancellationToken>());
 
             Assert.NotNull(handlerResult);
             Assert.Equal(response.Message, handlerResult.Message);
@@ -516,7 +514,7 @@ namespace ComputerShop.Tests.CommandHandlersTests
 
             var deleteCommand = new DeleteComputerCommand(computer.Id);
             var handler = new DeleteComputerCommandHandler(computerRepository.Object);
-            var handlerResult = await handler.Handle(deleteCommand, cancellationToken);
+            var handlerResult = await handler.Handle(deleteCommand, It.IsAny<CancellationToken>());
 
             Assert.NotNull(handlerResult);
             Assert.Equal(response.Message, handlerResult.Message);
